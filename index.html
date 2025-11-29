@@ -112,26 +112,29 @@
       renderCalendar();
     });
 
-    function renderCalendar() {
-      calendar.innerHTML = "";
-      for (let i = 1; i <= 25; i++) {
-        const box = document.createElement("div");
-        box.classList.add("day");
-        box.textContent = i;
+   function renderCalendar() {
+    calendar.innerHTML = "";
 
-        const alreadyOpened = openedDays.includes(i);
+    for (let i = 1; i <= 25; i++) {
+      const box = document.createElement("div");
+      box.classList.add("day");
+      box.textContent = i;
 
-        if (alreadyOpened) {
-          box.classList.add("opened");
-          box.onclick = () => openModal(i);
-        } else if (month === 12 && i === day) {
-          box.classList.add("available", "current");
-          box.onclick = () => openToday(i);
-        }
+      const alreadyOpened = openedDays.includes(i);
 
-        calendar.appendChild(box);
+      if (alreadyOpened) {
+        box.classList.add("opened");
+        box.onclick = () => openModal(i);
+      } else {
+        // For testing: make all boxes clickable
+        box.classList.add("available");
+        box.onclick = () => openToday(i);
       }
+
+      calendar.appendChild(box);
     }
+  }
+
 
     function openToday(day) {
       if (!openedDays.includes(day)) {
