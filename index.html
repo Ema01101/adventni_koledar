@@ -104,7 +104,8 @@
     };
 
     const userRef = ref(db, `users/${USER_ID}/openedDays`);
-    let openedDays = [];
+    let openedDays = [1, 3];
+    renderCalendar();
 
     onValue(userRef, snapshot => {
       openedDays = snapshot.val() || [];
