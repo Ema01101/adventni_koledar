@@ -13,7 +13,7 @@
     const firebaseConfig = {
       apiKey: "AIzaSyA01ppcnmR___c1-bN1Zz3VfNy9ke7LomA",
       authDomain: "advent-calendar-574ec.firebaseapp.com",
-      databaseURL: "https://advent-calendar-574ec-default-rtdb.firebaseio.com",
+      databaseURL: "https://advent-calendar-574ec-default-rtdb.firebaseio.com/:",
       projectId: "advent-calendar-574ec",
       storageBucket: "advent-calendar-574ec.appspot.com",
       messagingSenderId: "575683037336",
@@ -66,15 +66,40 @@
     const modalTitle = document.getElementById("modalTitle");
     const modalContent = document.getElementById("modalContent");
 
-    const today = new Date();
+    /*const today = new Date();
     const month = today.getMonth() + 1;
-    const day = today.getDate();
+    const day = today.getDate();*/
+    // For testing purposes, set date to December 25
+    const month = 12;
+    const day = 3;
+
 
     const messages = {
       1: "Message for Day 1 ♥",
       2: "Message for Day 2 ♥",
       3: "Message for Day 3 ♥",
       4: "...",
+      5: "...",
+      6: "...",
+      7: "...",
+      8: "...",
+      9: "...",
+      10: "...",
+      11: "...",
+      12: "...",
+      13: "...",
+      14: "...",
+      15: "...",
+      16: "...",
+      17: "...",
+      18: "...",
+      19: "...",
+      10: "...",
+      20: "...",
+      21: "...",
+      22: "...",
+      23: "...",
+      24: "...",
       25: "Merry Christmas, my love! 🎄♥"
     };
 
