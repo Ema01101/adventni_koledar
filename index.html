@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advent Calendar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f1eb;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .day {
+      background: #d4c6b3;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #4a3728;
+      cursor: not-allowed;
+      opacity: 0.5;
+      transition: transform 0.3s, background 0.3s;
+      user-select: none;
+    }
+
+    .day.available {
+      cursor: pointer;
+      opacity: 1;
+      background: #b59d82;
+    }
+
+    .day.current {
+      background: #f4d9b5 !important;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+      transform: scale(1.05);
+      opacity: 1 !important;
+    }
+
+    .day.opened {
+      background: #8fbf8f !important;
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .modal-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 350px;
+    }
+
+    .close {
+      margin-top: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background: #b59d82;
+      color: white;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="calendar" id="calendar"></div>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <h2 id="modalTitle"></h2>
+      <p id="modalContent"></p>
+      <button class="close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const calendar = document.getElementById("calendar");
+    const modalBg = document.getElementById("modalBg");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+
+    // Customize messages for each day
+    const messages = {
+      1: "Message for Day 1 ♥",
+      2: "Message for Day 2 ♥",
+      3: "Message for Day 3 ♥",
+      4: "...",
+      5: "...",
+      6: "...",
+      7: "...",
+      8: "...",
+      9: "...",
+      10: "...",
+      11: "...",
+      12: "...",
+      13: "...",
+      14: "...",
+      15: "...",
+      16: "...",
+      17: "...",
+      18: "...",
+      19: "...",
+      20: "...",
+      21: "...",
+      22: "...",
+      23: "...",
+      24: "...",
+      25: "Merry Christmas, my love! 🎄♥"
+    };
+
+    // Load opened days from localStorage
+    const openedDays = JSON.parse(localStorage.getItem("openedDays") || "[]");
+
+    for (let i = 1; i <= 25; i++) {
+      const box = document.createElement("div");
+      box.classList.add("day");
+      box.textContent = i;
+
+      const alreadyOpened = openedDays.includes(i);
+
+      if (alreadyOpened) {
+        box.classList.add("opened");
+        box.onclick = () => openModal(i);
+      }
+      else if (month === 12 && i === day) {
+        box.classList.add("available", "current");
+        box.onclick = () => openToday(i, box);
+      }
+
+      calendar.appendChild(box);
+    }
+
+    function openToday(day, box) {
+      saveOpenedDay(day);
+      box.classList.remove("current","available");
+      box.classList.add("opened");
+      openModal(day);
+    }
+
+    function openModal(day) {
+      modalTitle.textContent = `Day ${day}`;
+      modalContent.textContent = messages[day] || "No message added yet.";
+      modalBg.style.display = "flex";
+    }
+
+    function closeModal() {
+      modalBg.style.display = "none";
+    }
+
+    function saveOpenedDay(day) {
+      if (!openedDays.includes(day)) {
+        openedDays.push(day);
+        localStorage.setItem("openedDays", JSON.stringify(openedDays));
+      }
+    }
+  </script>
+</body>
+</html>
