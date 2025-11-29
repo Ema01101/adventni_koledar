@@ -22,7 +22,7 @@
 </head>
 <body>
   <div class="calendar-container">
-    <h1>🎄 Christmas Advent Calendar 🎁</h1>
+    <h1>🎄 Lovrotov adventni koledar 🎁</h1>
     <div class="calendar" id="calendar"></div>
   </div>
 
@@ -54,7 +54,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const USER_ID = "boyfriend"; // user name
+    const USER_ID = "Lovro"; // user name
     const calendar = document.getElementById("calendar");
     const modalBg = document.getElementById("modalBg");
     const modalTitle = document.getElementById("modalTitle");
@@ -135,7 +135,7 @@
 
     // Modal popup
     function openModal(dayNumber) {
-      modalTitle.textContent = `Day ${dayNumber}`;
+      modalTitle.textContent = `Dan ${dayNumber}`;
       modalContent.textContent = messages[dayNumber] || "No message yet.";
       modalBg.style.display = "flex";
     }
