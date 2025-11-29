@@ -6,12 +6,39 @@
   <title>Advent Calendar</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f6f1eb;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(#b30000, #4d0000);
       margin: 0;
       padding: 20px;
       display: flex;
       justify-content: center;
+      background-attachment: fixed;
+      color: white;
+    }
+
+    /* Snow animation */
+    .snowflake {
+      position: fixed;
+      top: -10px;
+      color: white;
+      font-size: 1em;
+      opacity: 0.9;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(110vh); }
+    }
+
+    .calendar-container {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
     }
 
     .calendar {
@@ -23,36 +50,40 @@
     }
 
     .day {
-      background: #d4c6b3;
-      border-radius: 12px;
+      background: #fff2cc;
+      border-radius: 16px;
       padding: 20px;
       text-align: center;
       font-size: 24px;
       font-weight: bold;
-      color: #4a3728;
+      color: #8b0000;
       cursor: not-allowed;
-      opacity: 0.5;
+      opacity: 0.55;
       transition: transform 0.3s, background 0.3s;
       user-select: none;
+      border: 3px solid #b30000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
     .day.available {
       cursor: pointer;
       opacity: 1;
-      background: #b59d82;
+      background: #ffdb99;
     }
 
     .day.current {
-      background: #f4d9b5 !important;
-      box-shadow: 0 0 12px rgba(0,0,0,0.2);
-      transform: scale(1.05);
+      background: #fff4cc !important;
+      box-shadow: 0 0 18px rgba(255, 230, 150, 0.9);
+      transform: scale(1.07);
       opacity: 1 !important;
+      border-color: gold !important;
     }
 
     .day.opened {
-      background: #8fbf8f !important;
+      background: #c2f0c2 !important;
       cursor: pointer;
       opacity: 1;
+      border-color: #2d7a2d !important;
     }
 
     .modal-bg {
@@ -73,6 +104,9 @@
       border-radius: 12px;
       text-align: center;
       max-width: 350px;
+      color: black;
+      box-shadow: 0 0 20px rgba(255,255,255,0.7);
+      border: 4px solid #b30000;
     }
 
     .close {
@@ -80,14 +114,35 @@
       padding: 10px 20px;
       cursor: pointer;
       border: none;
-      background: #b59d82;
+      background: #b30000;
       color: white;
       border-radius: 8px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <div class="calendar" id="calendar"></div>
+  <div class="calendar-container">
+    <h1>🎄 Lovrotov adventni koledar 2025 🎁</h1>
+    <div class="calendar" id="calendar"></div>
+  </div>
+
+  <!-- Snowflakes -->
+  <script>
+    function createSnowflakes() {
+      setInterval(() => {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.textContent = '❄';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = 5 + Math.random() * 7 + 's';
+        snowflake.style.fontSize = 10 + Math.random() * 20 + 'px';
+        document.body.appendChild(snowflake);
+        setTimeout(() => snowflake.remove(), 12000);
+      }, 400);
+    }
+    createSnowflakes();
+  </script>
 
   <div class="modal-bg" id="modalBg">
     <div class="modal">
@@ -104,15 +159,9 @@
     const modalContent = document.getElementById("modalContent");
 
     const today = new Date();
-    
-    //const month = today.getMonth() + 1;
-    //const day = today.getDate();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
 
-    const month = 12; // For testing purposes, set to December
-    const day = 3;   // For testing purposes, set to 1st
-
-
-    // Customize messages for each day
     const messages = {
       1: "Message for Day 1 ♥",
       2: "Message for Day 2 ♥",
@@ -141,7 +190,6 @@
       25: "Merry Christmas, my love! 🎄♥"
     };
 
-    // Load opened days from localStorage
     const openedDays = JSON.parse(localStorage.getItem("openedDays") || "[]");
 
     for (let i = 1; i <= 25; i++) {
@@ -189,3 +237,4 @@
   </script>
 </body>
 </html>
+
