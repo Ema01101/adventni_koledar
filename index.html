@@ -4,145 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Advent Calendar</title>
+  <script type="module">
+    // Import the functions you need from the modular SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyA01ppcnmR___c1-bN1Zz3VfNy9ke7LomA",
+      authDomain: "advent-calendar-574ec.firebaseapp.com",
+      databaseURL: "https://advent-calendar-574ec-default-rtdb.firebaseio.com",
+      projectId: "advent-calendar-574ec",
+      storageBucket: "advent-calendar-574ec.appspot.com",
+      messagingSenderId: "575683037336",
+      appId: "1:575683037336:web:c5f1c9579c8c93d63568ed"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.calendarDB = db; // make it accessible in window for other scripts
+  </script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(#b30000, #4d0000);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      background-attachment: fixed;
-      color: white;
-    }
-
-    /* Snow animation */
-    .snowflake {
-      position: fixed;
-      top: -10px;
-      color: white;
-      font-size: 1em;
-      opacity: 0.9;
-      animation: fall linear infinite;
-    }
-
-    @keyframes fall {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(110vh); }
-    }
-
-    .calendar-container {
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 36px;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
-    }
-
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 15px;
-      max-width: 700px;
-      width: 100%;
-    }
-
-    .day {
-      background: #fff2cc;
-      border-radius: 16px;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: #8b0000;
-      cursor: not-allowed;
-      opacity: 0.55;
-      transition: transform 0.3s, background 0.3s;
-      user-select: none;
-      border: 3px solid #b30000;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    .day.available {
-      cursor: pointer;
-      opacity: 1;
-      background: #ffdb99;
-    }
-
-    .day.current {
-      background: #fff4cc !important;
-      box-shadow: 0 0 18px rgba(255, 230, 150, 0.9);
-      transform: scale(1.07);
-      opacity: 1 !important;
-      border-color: gold !important;
-    }
-
-    .day.opened {
-      background: #c2f0c2 !important;
-      cursor: pointer;
-      opacity: 1;
-      border-color: #2d7a2d !important;
-    }
-
-    .modal-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 350px;
-      color: black;
-      box-shadow: 0 0 20px rgba(255,255,255,0.7);
-      border: 4px solid #b30000;
-    }
-
-    .close {
-      margin-top: 20px;
-      padding: 10px 20px;
-      cursor: pointer;
-      border: none;
-      background: #b30000;
-      color: white;
-      border-radius: 8px;
-      font-size: 16px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(#b30000, #4d0000); margin: 0; padding: 20px; display: flex; justify-content: center; background-attachment: fixed; color: white; }
+    .snowflake { position: fixed; top: -10px; color: white; opacity: 0.8; animation: fall linear infinite; }
+    @keyframes fall { 0% { transform: translateY(0); } 100% { transform: translateY(110vh); } }
+    .calendar-container { text-align: center; }
+    h1 { font-size: 36px; margin-bottom: 20px; text-shadow: 2px 2px 6px rgba(0,0,0,0.4); }
+    .calendar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 700px; width: 100%; }
+    .day { background: #fff2cc; border-radius: 16px; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #8b0000; cursor: not-allowed; opacity: 0.55; transition: transform 0.3s, background 0.3s; user-select: none; border: 3px solid #b30000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    .day.available { cursor: pointer; opacity: 1; background: #ffdb99; }
+    .day.current { background: #fff4cc !important; box-shadow: 0 0 18px rgba(255, 230, 150, 0.9); transform: scale(1.07); opacity: 1 !important; border-color: gold !important; }
+    .day.opened { background: #c2f0c2 !important; cursor: pointer; opacity: 1; border-color: #2d7a2d !important; }
+    .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; }
+    .modal { background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 350px; color: black; border: 4px solid #b30000; }
+    .close { margin-top: 20px; padding: 10px 20px; cursor: pointer; border: none; background: #b30000; color: white; border-radius: 8px; font-size: 16px; }
   </style>
 </head>
 <body>
   <div class="calendar-container">
-    <h1>🎄 Lovrotov adventni koledar 2025 🎁</h1>
+    <h1>🎄 Christmas Advent Calendar 🎁</h1>
     <div class="calendar" id="calendar"></div>
   </div>
-
-  <!-- Snowflakes -->
-  <script>
-    function createSnowflakes() {
-      setInterval(() => {
-        const snowflake = document.createElement('div');
-        snowflake.classList.add('snowflake');
-        snowflake.textContent = '❄';
-        snowflake.style.left = Math.random() * 100 + 'vw';
-        snowflake.style.animationDuration = 5 + Math.random() * 7 + 's';
-        snowflake.style.fontSize = 10 + Math.random() * 20 + 'px';
-        document.body.appendChild(snowflake);
-        setTimeout(() => snowflake.remove(), 12000);
-      }, 400);
-    }
-    createSnowflakes();
-  </script>
 
   <div class="modal-bg" id="modalBg">
     <div class="modal">
@@ -152,7 +56,11 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+
+    const USER_ID = "boyfriend";
     const calendar = document.getElementById("calendar");
     const modalBg = document.getElementById("modalBg");
     const modalTitle = document.getElementById("modalTitle");
@@ -167,60 +75,49 @@
       2: "Message for Day 2 ♥",
       3: "Message for Day 3 ♥",
       4: "...",
-      5: "...",
-      6: "...",
-      7: "...",
-      8: "...",
-      9: "...",
-      10: "...",
-      11: "...",
-      12: "...",
-      13: "...",
-      14: "...",
-      15: "...",
-      16: "...",
-      17: "...",
-      18: "...",
-      19: "...",
-      20: "...",
-      21: "...",
-      22: "...",
-      23: "...",
-      24: "...",
       25: "Merry Christmas, my love! 🎄♥"
     };
 
-    const openedDays = JSON.parse(localStorage.getItem("openedDays") || "[]");
+    const userRef = ref(db, `users/${USER_ID}/openedDays`);
+    let openedDays = [];
 
-    for (let i = 1; i <= 25; i++) {
-      const box = document.createElement("div");
-      box.classList.add("day");
-      box.textContent = i;
+    onValue(userRef, snapshot => {
+      openedDays = snapshot.val() || [];
+      renderCalendar();
+    });
 
-      const alreadyOpened = openedDays.includes(i);
+    function renderCalendar() {
+      calendar.innerHTML = "";
+      for (let i = 1; i <= 25; i++) {
+        const box = document.createElement("div");
+        box.classList.add("day");
+        box.textContent = i;
 
-      if (alreadyOpened) {
-        box.classList.add("opened");
-        box.onclick = () => openModal(i);
+        const alreadyOpened = openedDays.includes(i);
+
+        if (alreadyOpened) {
+          box.classList.add("opened");
+          box.onclick = () => openModal(i);
+        } else if (month === 12 && i === day) {
+          box.classList.add("available", "current");
+          box.onclick = () => openToday(i);
+        }
+
+        calendar.appendChild(box);
       }
-      else if (month === 12 && i === day) {
-        box.classList.add("available", "current");
-        box.onclick = () => openToday(i, box);
-      }
-
-      calendar.appendChild(box);
     }
 
-    function openToday(day, box) {
-      saveOpenedDay(day);
-      box.classList.remove("current","available");
-      box.classList.add("opened");
+    function openToday(day) {
+      if (!openedDays.includes(day)) {
+        openedDays.push(day);
+        set(ref(db, `users/${USER_ID}/openedDays`), openedDays);
+      }
       openModal(day);
     }
 
     function openModal(day) {
       modalTitle.textContent = `Day ${day}`;
-      modalContent.textContent = messages[day] || "No message added yet.";
+      modalContent.textContent = messages[day] || "No message yet.";
       modalBg.style.display = "flex";
     }
 
@@ -228,13 +125,22 @@
       modalBg.style.display = "none";
     }
 
-    function saveOpenedDay(day) {
-      if (!openedDays.includes(day)) {
-        openedDays.push(day);
-        localStorage.setItem("openedDays", JSON.stringify(openedDays));
-      }
+    // Snowflakes
+    function createSnowflakes() {
+      setInterval(() => {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.textContent = '❄';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = 5 + Math.random() * 7 + 's';
+        snowflake.style.fontSize = 10 + Math.random() * 20 + 'px';
+        document.body.appendChild(snowflake);
+        setTimeout(() => snowflake.remove(), 12000);
+      }, 400);
     }
+    createSnowflakes();
   </script>
 </body>
 </html>
+
 
