@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advent Calendar</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(#b30000, #4d0000); margin: 0; padding: 20px; display: flex; justify-content: center; background-attachment: fixed; color: white; overflow-x: hidden;}
+    .snowflake { position: fixed; top: -10px; color: white; opacity: 0.8; animation: fall linear infinite; pointer-events: none; }
+    @keyframes fall { 0% { transform: translateY(0); } 100% { transform: translateY(110vh); } }
+    .calendar-container { text-align: center; }
+    h1 { font-size: 36px; margin-bottom: 20px; text-shadow: 2px 2px 6px rgba(0,0,0,0.4); }
+    .calendar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 700px; width: 100%; }
+    .day { background: #fff2cc; border-radius: 16px; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #8b0000; cursor: not-allowed; opacity: 0.55; transition: transform 0.3s, background 0.3s; user-select: none; border: 3px solid #b30000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    .day.available { cursor: pointer; opacity: 1; background: #ffdb99; }
+    .day.current { background: #fff4cc !important; box-shadow: 0 0 18px rgba(255, 230, 150, 0.9); transform: scale(1.07); opacity: 1 !important; border-color: gold !important; }
+    .day.opened { background: #c2f0c2 !important; cursor: pointer; opacity: 1; border-color: #2d7a2d !important; }
+    .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; }
+    .modal { background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 350px; color: black; border: 4px solid #b30000; }
+    .close { margin-top: 20px; padding: 10px 20px; cursor: pointer; border: none; background: #b30000; color: white; border-radius: 8px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="calendar-container">
+    <h1>🎄 Lovrotov adventni koledar 2025 🎁</h1>
+    <div class="calendar" id="calendar"></div>
+  </div>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <h2 id="modalTitle"></h2>
+      <p id="modalContent"></p>
+      <button class="close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import Firebase modular SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA01ppcnmR___c1-bN1Zz3VfNy9ke7LomA",
+      authDomain: "advent-calendar-574ec.firebaseapp.com",
+      databaseURL: "https://advent-calendar-574ec-default-rtdb.firebaseio.com",
+      projectId: "advent-calendar-574ec",
+      storageBucket: "advent-calendar-574ec.appspot.com",
+      messagingSenderId: "575683037336",
+      appId: "1:575683037336:web:c5f1c9579c8c93d63568ed"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const USER_ID = "Lovro"; // user name
+    const calendar = document.getElementById("calendar");
+    const modalBg = document.getElementById("modalBg");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    /*const month = 12; // For testing purposes, set to December
+    const day = 3;   // For testing purposes, set to 25th*/
+
+    const messages = {
+      1: "Hello my love! This is the first day of our 2025 advent adventure. Today, take a moment to smile and know that I’m thinking of you. You’re amazing.",
+      2: "Send me a funny picture today — I want to see that beautiful smile!",
+      3: "Take a moment to relax and do something that makes you happy, just for you.",
+      4: "Write down three things you’re proud of today — you’re incredible, and I love you.",
+      5: "I love you to the moon and back <3",
+      6: "Think of 5 things you are grateful for today — I hope one of them is us ♥",
+      7: "It’s the secound Sunday of Advent! Light the second candle on your wreath and think of all the joy coming this season.",
+      8: "Take a short walk outside and breathe deeply — I’ll be thinking of you while you do",
+      9: "Send me a song that makes you smile today — I want to feel your vibes even from afar.",
+      10: "Do something creative today, even if it’s small — draw, write, or just doodle. I love your imagination",
+      11: "Treat yourself to your favorite snack or drink — you deserve it, my love",
+      12: "Think of a memory we shared that makes you laugh and carry that happiness with you today",
+      13: "Write a little note to yourself reminding how amazing and strong you are — and yes, I agree",
+      14: "Third Sunday of Advent! Light the third candle on your wreath and think of all the warmth around you.",
+      15: "Take 10 minutes today just for yourself — read, meditate, or simply enjoy a quiet moment",
+      16: "Take a moment today to call or text someone you love — share some joy",
+      17: "Do one small act of kindness today, whether for someone else or yourself — spread joy",
+      18: "Think about one dream you want to achieve — I believe in you completely. Im sure you can achieve anything you set your mind to.",
+      19: "Treat yourself to something cozy tonight — maybe a warm drink or comfy socks",
+      20: "Write a short list of things that make you happy — I hope our love is on there somewhere",
+      21: "Fourth Sunday of Advent! Light the Fourth candle on your wreath and reflect on all the love that surrounds you",
+      22: "Happy 1-year anniversary, my love! I still remember the moment we met like it was yesterday, and every day since has been a beautiful adventure with you. Thank you for filling my life with laughter, love, and warmth. Today, I celebrate us — every smile, every hug, every little moment that makes us ¨us¨¨. I love you more than words can ever say, and I can’t wait for all the memories we’ll create together in the years to come. ♥",
+      23: "Think of three little ways you made someone smile recently — you’re amazing",
+      24: "onight is Christmas Eve! Take a quiet moment and remember how much I love you. I can’t wait for tomorrow!",
+      25: "Merry Christmas, my love! Thank you for being the most wonderful part of my life. I love you endlessly 🎄♥"
+    };
+
+    const userRef = ref(db, `users/${USER_ID}/openedDays`);
+    let openedDays = [];
+
+    // Render calendar based on openedDays and current day
+    function renderCalendar() {
+      calendar.innerHTML = "";
+      for (let i = 1; i <= 25; i++) {
+        const box = document.createElement("div");
+        box.classList.add("day");
+        box.textContent = i;
+
+        if (openedDays.includes(i)) {
+          box.classList.add("opened");
+          box.onclick = () => openModal(i);
+        } else if (month === 12 && i === day) {
+          box.classList.add("available", "current");
+          box.onclick = () => openToday(i);
+        } else if (month === 12 && i < day) {
+          // Past days (locked, cannot open)
+          box.classList.add("day");
+        } else if (month === 12 && i > day) {
+          // Future days (locked)
+          box.classList.add("day");
+        }
+
+        calendar.appendChild(box);
+      }
+    }
+
+    // Open a box today
+    function openToday(dayNumber) {
+      if (!openedDays.includes(dayNumber)) {
+        openedDays.push(dayNumber);
+        set(userRef, openedDays);
+      }
+      openModal(dayNumber);
+      renderCalendar();
+    }
+
+    // Modal popup
+    function openModal(dayNumber) {
+      modalTitle.textContent = `Dan ${dayNumber}`;
+      modalContent.textContent = messages[dayNumber] || "No message yet.";
+      modalBg.style.display = "flex";
+    }
+    window.closeModal = () => modalBg.style.display = "none";
+
+    // Fetch user's opened days from Firebase
+    onValue(userRef, snapshot => {
+      openedDays = snapshot.val() || [];
+      renderCalendar();
+    });
+
+    // Snowflakes
+    function createSnowflakes() {
+      setInterval(() => {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.textContent = '❄';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = 5 + Math.random() * 7 + 's';
+        snowflake.style.fontSize = 10 + Math.random() * 20 + 'px';
+        document.body.appendChild(snowflake);
+        setTimeout(() => snowflake.remove(), 12000);
+      }, 400);
+    }
+    createSnowflakes();
+  </script>
+</body>
+</html>
