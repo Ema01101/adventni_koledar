@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🎄 Christmas Advent Calendar 🎁</title>
 
   <!-- Supabase JS -->
@@ -17,8 +17,11 @@
       display: flex; justify-content: center;
       background-attachment: fixed;
     }
-
-    h1 { font-size: 36px; margin-bottom: 20px; text-shadow: 2px 2px 6px rgba(0,0,0,0.4); }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+    }
 
     .calendar-container { text-align: center; }
     .calendar {
@@ -77,10 +80,9 @@
     // --- Supabase config ---
     const SUPABASE_URL = "https://iamogjtfqfvhgbmlefeg.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhbW9nanRmcWZnbGJlbmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNjg2OTQsImV4cCI6MjA3OTk0NDY5NH0.h8HlGGizch5BcQtr4rO_v1ufVRVvfa4mDui7uVwr5YU";
-
     const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const USER_ID = "boyfriend"; // keep this consistent
+    const USER_ID = "boyfriend";
     const calendar = document.getElementById("calendar");
     const modalBg = document.getElementById("modalBg");
     const modalTitle = document.getElementById("modalTitle");
@@ -88,75 +90,53 @@
     const photoInput = document.getElementById("photoInput");
     const uploadedPhotosDiv = document.getElementById("uploadedPhotos");
 
-    // --- Date (for testing, you can override) ---
+    // --- Date ---
     const today = new Date();
-    let currentMonth = today.getMonth() + 1;
-    let currentDay = today.getDate();
+    /*let currentMonth = today.getMonth() + 1;
+    let currentDay = today.getDate();*/
+    let currentDay = 25; // For testing purposes, set to 25. Change to 'today.getDate()' for real use.
+    let currentMonth = 12;
 
     // --- Messages ---
     const messages = {
-      1: "Message for Day 1 ♥",
-      2: "Message for Day 2 ♥",
-      3: "Message for Day 3 ♥",
-      4: "Do something kind for yourself today ♥",
-      5: "Think of 5 things you are grateful for ♥",
-      6: "Relax and listen to your favorite song today",
-      7: "Light the first candle of your Advent wreath 🕯️",
-      8: "Write a sweet note to yourself",
-      9: "Take a little walk outside today",
-      10: "Give yourself extra hugs today ♥",
-      11: "Do a small creative project",
-      12: "Take 10 minutes to meditate",
-      13: "Surprise someone with a kind message",
-      14: "Light the second candle of your Advent wreath 🕯️",
-      15: "Spend extra time on your favorite hobby",
-      16: "Think about your happiest memory this year",
-      17: "Make a hot drink and relax",
-      18: "Write a little poem for me ♥",
-      19: "Take a small self-care break",
-      20: "Call a loved one and tell them you care",
-      21: "Light the third candle of your Advent wreath 🕯️",
-      22: "Happy 1 year anniversary, my love! ❤️",
-      23: "Treat yourself to your favorite snack today",
-      24: "Reflect on the past year with gratitude",
-      25: "Merry Christmas, my love! 🎄♥"
+      1:"Message for Day 1 ♥",2:"Message for Day 2 ♥",3:"Message for Day 3 ♥",4:"Do something kind for yourself today ♥",
+      5:"Think of 5 things you are grateful for ♥",6:"Relax and listen to your favorite song today",
+      7:"Light the first candle of your Advent wreath 🕯️",8:"Write a sweet note to yourself",9:"Take a little walk outside today",
+      10:"Give yourself extra hugs today ♥",11:"Do a small creative project",12:"Take 10 minutes to meditate",
+      13:"Surprise someone with a kind message",14:"Light the second candle of your Advent wreath 🕯️",15:"Spend extra time on your favorite hobby",
+      16:"Think about your happiest memory this year",17:"Make a hot drink and relax",18:"Write a little poem for me ♥",
+      19:"Take a small self-care break",20:"Call a loved one and tell them you care",
+      21:"Light the third candle of your Advent wreath 🕯️",22:"Happy 1 year anniversary, my love! ❤️",
+      23:"Treat yourself to your favorite snack today",24:"Reflect on the past year with gratitude",25:"Merry Christmas, my love! 🎄♥"
     };
 
     let openedDays = [];
 
-    // --- Load opened days from Supabase ---
-    async function fetchOpenedDays() {
-      const { data, error } = await supabase
-        .from('opened_days')
-        .select('*')
-        .eq('user_id', USER_ID);
-
-      if (error) {
-        console.error("Fetch opened_days error:", error);
-        return;
-      }
-
-      openedDays = data.map(row => row.day);
+    // --- Fetch opened days ---
+    async function fetchOpenedDays(){
+      const { data, error } = await supabase.from('opened_days').select('*').eq('user_id', USER_ID);
+      if(error){console.error("Fetch opened_days error:", error);}
+      else openedDays = data.map(row => row.day);
       renderCalendar();
     }
 
     // --- Render calendar ---
-    function renderCalendar() {
-      calendar.innerHTML = "";
-      for (let i = 1; i <= 25; i++) {
-        const box = document.createElement("div");
+    function renderCalendar(){
+      calendar.innerHTML="";
+      for(let i=1;i<=25;i++){
+        const box=document.createElement("div");
         box.classList.add("day");
-        box.textContent = i;
+        box.textContent=i;
 
         const alreadyOpened = openedDays.includes(i);
 
-        if (alreadyOpened) {
+        if(alreadyOpened){
           box.classList.add("opened");
-          box.onclick = () => openModal(i);
-        } else if (i <= currentDay) {
+          box.onclick = ()=>openModal(i);
+        } else if(i <= currentDay){
           box.classList.add("available");
-          if (i === currentDay) box.classList.add("current");
-          box.onclick = () => openDay(i);
+          if(i === currentDay) box.classList.add("current");
+          box.onclick = ()=>openDay(i);
         }
 
         calendar.appendChild(box);
@@ -164,103 +144,80 @@
     }
 
     // --- Open a day ---
-    async function openDay(day) {
-      if (!openedDays.includes(day)) {
-        // Insert into Supabase
-        const { error } = await supabase
-          .from('opened_days')
-          .insert([{ user_id: USER_ID, day }]);
-        if (error) console.error("Insert opened_days error:", error);
+    async function openDay(day){
+      if(!openedDays.includes(day)){
+        const { error } = await supabase.from('opened_days').insert([{user_id: USER_ID, day}]);
+        if(error) console.error("Insert opened_days error:", error);
         openedDays.push(day);
       }
       openModal(day);
     }
 
     // --- Open modal ---
-    async function openModal(day) {
+    async function openModal(day){
       modalTitle.textContent = `Day ${day}`;
       modalContent.textContent = messages[day] || "No message yet.";
-      uploadedPhotosDiv.innerHTML = "";
-      photoInput.value = "";
-      modalBg.style.display = "flex";
+      uploadedPhotosDiv.innerHTML="";
+      photoInput.value="";
+      modalBg.style.display="flex";
 
-      // Load photos for this day
-      const { data, error } = await supabase
-        .from('photos')
-        .select('*')
-        .eq('user_id', USER_ID)
-        .eq('day', day);
+      // Load photos
+      const { data, error } = await supabase.from('photos').select('*').eq('user_id', USER_ID).eq('day', day);
+      if(error) console.error("Fetch photos error:", error);
+      else data.forEach(p=>{
+        const img=document.createElement("img");
+        img.src=p.url;
+        img.classList.add("uploaded-photo");
+        uploadedPhotosDiv.appendChild(img);
+      });
 
-      if (error) console.error("Fetch photos error:", error);
-      else {
-        data.forEach(p => {
-          const img = document.createElement("img");
-          img.src = p.url;
-          img.classList.add("uploaded-photo");
-          uploadedPhotosDiv.appendChild(img);
-        });
-      }
-
-      // Attach upload listener
+      // Upload photo
       photoInput.onchange = async () => {
         const file = photoInput.files[0];
-        if (!file) return;
+        if(!file) return;
 
         const timestamp = Date.now();
         const cleanName = file.name.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_\.-]/g,'');
         const path = `users/${USER_ID}/day${day}/${timestamp}_${cleanName}`;
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('photos')
-          .upload(path, file, { upsert: true });
+        const { data: uploadData, error: uploadError } = await supabase.storage.from('photos').upload(path,file,{upsert:true});
+        if(uploadError){console.error("Upload error",uploadError); alert("Upload failed!"); return;}
 
-        if (uploadError) {
-          console.error("Upload error", uploadError);
-          alert("Upload failed!");
-          return;
-        }
-
-        // Get public URL
         const { data: urlData } = supabase.storage.from('photos').getPublicUrl(path);
         const url = urlData.publicUrl;
 
-        // Insert into DB
-        const { error: dbError } = await supabase
-          .from('photos')
-          .insert([{ user_id: USER_ID, day, url, path }]);
+        const { error: dbError } = await supabase.from('photos').insert([{user_id:USER_ID,day,url,path}]);
+        if(dbError) console.error("DB insert error:", dbError);
 
-        if (dbError) console.error("DB insert error:", dbError);
-
-        // Show image
-        const img = document.createElement("img");
-        img.src = url;
+        const img=document.createElement("img");
+        img.src=url;
         img.classList.add("uploaded-photo");
         uploadedPhotosDiv.appendChild(img);
       };
     }
 
-    function closeModal() { modalBg.style.display = "none"; }
+    function closeModal(){ modalBg.style.display="none"; }
 
     // --- Snowflakes ---
-    function createSnowflakes() {
-      setInterval(() => {
-        const snowflake = document.createElement('div');
+    function createSnowflakes(){
+      setInterval(()=>{
+        const snowflake=document.createElement('div');
         snowflake.classList.add('snowflake');
-        snowflake.textContent = '❄';
-        snowflake.style.left = Math.random() * 100 + 'vw';
-        snowflake.style.animationDuration = 5 + Math.random() * 7 + 's';
-        snowflake.style.fontSize = 10 + Math.random() * 20 + 'px';
+        snowflake.textContent='❄';
+        snowflake.style.left=Math.random()*100+'vw';
+        snowflake.style.animationDuration=5+Math.random()*7+'s';
+        snowflake.style.fontSize=10+Math.random()*20+'px';
         document.body.appendChild(snowflake);
-        setTimeout(() => snowflake.remove(), 12000);
-      }, 400);
+        setTimeout(()=>snowflake.remove(),12000);
+      },400);
     }
 
     createSnowflakes();
     fetchOpenedDays();
-
   </script>
 </body>
 </html>
+
 
 
 
