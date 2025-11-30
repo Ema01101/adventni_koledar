@@ -30,22 +30,7 @@
   </style>
 </head>
 <body>
-  <div id="introModalBg">
-    <div id="introModal">
-      <h2>🎁 Welcome to Your Advent Calendar 🎄</h2>
-      <p style="margin-top:10px;">
-        I made this special advent calendar just for you <3.  
-        Every day from December 1st to 25th you'll get a little message,  
-        a tiny task, or something sweet to brighten your day.  
-        <br><br>
-        You can only open the box on the correct day — past days, you already opened, stay visible,  
-        but future days stay locked until it's time.  
-        <br><br>
-        I hope this brings you joy every morning. ♥
-      </p>
-      <button onclick="closeIntro()">OK, I understand!</button>
-    </div>
-  </div>
+
 
   <div class="calendar-container">
     <h1>🎄 Lovrotov adventni koledar 2025 🎁</h1>
@@ -179,19 +164,6 @@
     // INTRO POPUP
     const introBg = document.getElementById("introModalBg");
 
-    function maybeShowIntro() {
-      const seen = localStorage.getItem("introSeen");
-      if (!seen) {
-        introBg.style.display = "flex";
-      }
-    }
-
-    window.closeIntro = () => {
-      localStorage.setItem("introSeen", "yes");
-      introBg.style.display = "none";
-    };
-
-    maybeShowIntro();
 
     // Snowflakes
     function createSnowflakes() {
