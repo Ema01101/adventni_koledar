@@ -45,6 +45,23 @@
     </div>
   </div>
 
+  <button id="showIntroBtn" onclick="showIntro()" 
+    style="
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #b30000;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 1000;
+    ">
+    Show intro again
+  </button>
+
   <script type="module">
     // Import Firebase modular SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
@@ -238,22 +255,7 @@
 
 
   </script>
-    <button id="showIntroBtn" onclick="showIntro()" 
-    style="
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #b30000;
-      color: white;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-size: 14px;
-      cursor: pointer;
-      z-index: 1000;
-    ">
-    Show intro again
-  </button>
+
 
 </body>
 </html>
