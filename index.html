@@ -82,6 +82,9 @@
 
     const USER_ID = "Lovro";
 
+    const introRef = ref(db, `users/${USER_ID}/introSeen`);
+
+
     const calendar = document.getElementById("calendar");
     const modalBg = document.getElementById("modalBg");
     const modalTitle = document.getElementById("modalTitle");
@@ -164,6 +167,15 @@
       renderCalendar();
     });
 
+        // Check whether intro was already seen
+    onValue(introRef, snapshot => {
+      const seen = snapshot.val();
+      if (!seen) {
+        showIntroPopup();
+      }
+    });
+
+
     // INTRO POPUP
     const introBg = document.getElementById("introModalBg");
 
@@ -195,6 +207,57 @@
       }, 400);
     }
     createSnowflakes();
+
+        // Show intro popup HTML
+    function showIntroPopup() {
+      const introBg = document.createElement("div");
+      introBg.style.position = "fixed";
+      introBg.style.top = "0";
+      introBg.style.left = "0";
+      introBg.style.width = "100%";
+      introBg.style.height = "100%";
+      introBg.style.background = "rgba(0,0,0,0.6)";
+      introBg.style.display = "flex";
+      introBg.style.justifyContent = "center";
+      introBg.style.alignItems = "center";
+      introBg.style.zIndex = "9999";
+
+      const introBox = document.createElement("div");
+      introBox.style.background = "white";
+      introBox.style.color = "black";
+      introBox.style.padding = "25px";
+      introBox.style.borderRadius = "12px";
+      introBox.style.maxWidth = "350px";
+      introBox.style.textAlign = "center";
+      introBox.style.border = "4px solid #b30000";
+
+      introBox.innerHTML = `
+        <h2>Welcome to Your Advent Calendar 🎄</h2>
+        <p style="margin-bottom: 15px;">
+          I made this special advent calendar just for you.  
+          Every day in December, you'll find a sweet message or a tiny task inside a box.  
+          You can only open each box on the correct day, but you can always revisit the boxes you’ve already opened.  
+          I hope it brings you joy every single day. ❤️
+        </p>
+        <button id="introOkBtn" style="
+          padding: 10px 20px;
+          background: #b30000;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+        ">Ok, I understand</button>
+      `;
+
+      introBg.appendChild(introBox);
+      document.body.appendChild(introBg);
+
+      document.getElementById("introOkBtn").onclick = () => {
+        set(ref(db, `users/${USER_ID}/introSeen`), true);
+        introBg.remove();
+      };
+    }
   </script>
 </body>
 </html>
