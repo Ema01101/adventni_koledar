@@ -160,6 +160,10 @@
       }
     });
 
+    window.showIntro = function() {
+      introModalBg.style.display = "flex";
+    };
+
 
     // INTRO POPUP
     const introBg = document.getElementById("introModalBg");
@@ -231,9 +235,7 @@
       };
     }
 
-    window.showIntro = function() {
-      introModalBg.style.display = "flex";
-    };
+
 
   </script>
     <button id="showIntroBtn" onclick="showIntro()" 
