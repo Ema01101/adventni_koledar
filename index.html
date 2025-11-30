@@ -1,247 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Advent Calendar (Supabase)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advent Calendar</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(#b30000,#4d0000); margin:0; padding:20px; display:flex; justify-content:center; color:white; overflow-x:hidden; }
-    .calendar-container { text-align:center; width:100%; max-width:900px; }
-    h1 { font-size:36px; margin-bottom:18px; text-shadow:2px 2px 6px rgba(0,0,0,0.4); }
-    .calendar { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin:0 auto; }
-    .day { background:#fff2cc; border-radius:14px; padding:20px 10px; text-align:center; font-size:22px; font-weight:700; color:#8b0000; cursor:not-allowed; opacity:.55; transition:transform .18s,background .18s; user-select:none; border:3px solid #b30000; box-shadow:0 6px 14px rgba(0,0,0,.25); min-height:70px; display:flex; align-items:center; justify-content:center; }
-    .day.available { cursor:pointer; opacity:1; background:#ffdb99; }
-    .day.current { background:#fff4cc !important; box-shadow:0 0 18px rgba(255,230,150,.9); transform:scale(1.06); opacity:1 !important; border-color:gold !important; }
-    .day.opened { background:#c2f0c2 !important; cursor:pointer; opacity:1; border-color:#2d7a2d !important; }
-    .modal-bg { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); z-index:40; }
-    .modal { background:#fff; color:#111; padding:18px; border-radius:12px; width:clamp(300px,70vw,520px); box-shadow:0 10px 30px rgba(0,0,0,.35); border:4px solid #b30000; text-align:left; }
-    .modal h2 { margin:0 0 10px 0; font-size:20px; color:#b30000; text-align:center; }
-    .modal p { margin:0 0 14px 0; white-space:pre-wrap; }
-    .modal img { display:block; max-width:100%; border-radius:8px; margin-top:10px; }
-    .modal .controls { display:flex; gap:8px; justify-content:center; margin-top:12px; }
-    .btn { background:#b30000; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
-    .btn.secondary { background:#777; }
-    .upload-row { display:flex; gap:10px; align-items:center; justify-content:center; margin-top:8px; flex-wrap:wrap; }
-    .small { font-size:13px; color:#eee; margin-top:6px; text-align:center; }
-    .snowflake { position:fixed; top:-10px; color:white; opacity:.9; pointer-events:none; transform:translateY(0); animation: fall linear infinite; z-index:10; }
-    @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); } 100% { transform: translateY(115vh) rotate(180deg); } }
-    @media (max-width:560px){ .day{padding:14px;font-size:20px; min-height:64px;} h1{font-size:28px;} }
+    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(#b30000, #4d0000); margin: 0; padding: 20px; display: flex; justify-content: center; background-attachment: fixed; color: white; overflow-x: hidden;}
+    .snowflake { position: fixed; top: -10px; color: white; opacity: 0.8; animation: fall linear infinite; pointer-events: none; }
+    @keyframes fall { 0% { transform: translateY(0); } 100% { transform: translateY(110vh); } }
+    .calendar-container { text-align: center; }
+    h1 { font-size: 36px; margin-bottom: 20px; text-shadow: 2px 2px 6px rgba(0,0,0,0.4); }
+    .calendar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; max-width: 700px; width: 100%; }
+    .day { background: #fff2cc; border-radius: 16px; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #8b0000; cursor: not-allowed; opacity: 0.55; transition: transform 0.3s, background 0.3s; user-select: none; border: 3px solid #b30000; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    .day.available { cursor: pointer; opacity: 1; background: #ffdb99; }
+    .day.current { background: #fff4cc !important; box-shadow: 0 0 18px rgba(255, 230, 150, 0.9); transform: scale(1.07); opacity: 1 !important; border-color: gold !important; }
+    .day.opened { background: #c2f0c2 !important; cursor: pointer; opacity: 1; border-color: #2d7a2d !important; }
+    .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; }
+    .modal { background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 350px; color: black; border: 4px solid #b30000; }
+    .close { margin-top: 20px; padding: 10px 20px; cursor: pointer; border: none; background: #b30000; color: white; border-radius: 8px; font-size: 16px; }
   </style>
 </head>
 <body>
   <div class="calendar-container">
-    <h1>🎄 Christmas Advent Calendar 🎁</h1>
+    <h1>🎄 Lovrotov adventni koledar 2025 🎁</h1>
     <div class="calendar" id="calendar"></div>
-    <div class="small">Tip: only the current day's box can be opened (unless already opened). Photos you upload show when you re-open that day's modal.</div>
   </div>
 
-  <div class="modal-bg" id="modalBg" role="dialog" aria-modal="true">
-    <div class="modal" id="modal">
-      <h2 id="modalTitle">Day</h2>
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <h2 id="modalTitle"></h2>
       <p id="modalContent"></p>
-
-      <div id="photoArea" style="text-align:center;">
-        <img id="uploadedPhoto" style="display:none;" alt="Uploaded photo" />
-        <div class="upload-row" id="uploadRow" style="display:none;">
-          <input id="photoUpload" type="file" accept="image/*" />
-          <button id="uploadBtn" class="btn">Upload photo</button>
-        </div>
-        <div id="uploadStatus" class="small" style="display:none;"></div>
-      </div>
-
-      <div class="controls">
-        <button class="btn" id="closeBtn">Close</button>
-        <button class="btn secondary" id="deletePhotoBtn" style="display:none;">Remove photo</button>
-      </div>
+      <button class="close" onclick="closeModal()">Close</button>
     </div>
   </div>
 
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    // Import Firebase modular SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-    const SUPABASE_URL = 'https://iamogjtfqfvhgbmlefeg.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhbW9nanRmcWZ2aGdibWxlZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNjg2OTQsImV4cCI6MjA3OTk0NDY5NH0.h8HlGGizch5BcQtr4rO_v1ufVRVvfa4mDui7uVwr5YU';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const calendar = document.getElementById('calendar');
-    const modalBg = document.getElementById('modalBg');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalContent = document.getElementById('modalContent');
-    const uploadedPhoto = document.getElementById('uploadedPhoto');
-    const uploadRow = document.getElementById('uploadRow');
-    const photoUpload = document.getElementById('photoUpload');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const uploadStatus = document.getElementById('uploadStatus');
-    const closeBtn = document.getElementById('closeBtn');
-    const deletePhotoBtn = document.getElementById('deletePhotoBtn');
-
-    const USER_ID = 'boyfriend';
-    const TEST_MODE = true;
-    const TEST_MONTH = 12;
-    const TEST_DAY = 3;
-    const now = TEST_MODE ? new Date(2020, TEST_MONTH - 1, TEST_DAY) : new Date();
-    const month = now.getMonth()+1;
-    const day = now.getDate();
-
-    const messages = {
-      1:"Good morning, love! Today, take a moment to smile and know that I’m thinking of you. You’re amazing.",
-      2:"Send me a funny picture today — I want to see that beautiful smile!",
-      3:"Take a moment to relax and do something that makes you happy, just for you.",
-      4:"Write down three things you’re proud of today — you’re incredible, and I love you.",
-      5:"Surprise me with a sweet message later, just because… you make my day every day.",
-      6:"Think of 5 things you are grateful for today — I hope one of them is us 💖.",
-      7:"🕯️ First Sunday of Advent — light the first candle on your wreath and think of the joy coming this season.",
-      8:"Take a short walk outside and breathe deeply — I’ll be thinking of you while you do.",
-      9:"Send me a song that makes you smile today — I want to feel your vibes even from afar.",
-      10:"Do something creative today, even if it’s small — draw, write, or just doodle. I love your imagination.",
-      11:"Treat yourself to your favorite snack or drink — you deserve it, sweetheart.",
-      12:"Think of a memory we shared that makes you laugh and carry that happiness with you today.",
-      13:"Write a little note to yourself reminding how amazing and strong you are — and yes, I agree ❤️.",
-      14:"🕯️ Second Sunday of Advent — light the second candle on your wreath and think of all the warmth around you.",
-      15:"Take 10 minutes today just for yourself — read, meditate, or simply enjoy a quiet moment.",
-      16:"Send me a voice note saying something silly — I love hearing your voice.",
-      17:"Do one small act of kindness today, whether for someone else or yourself — spread joy.",
-      18:"Think about one dream you want to achieve — I believe in you completely.",
-      19:"Treat yourself to something cozy tonight — maybe a warm drink or comfy socks.",
-      20:"Write a short list of things that make you happy — I hope our love is on there somewhere 💕.",
-      21:"🕯️ Third Sunday of Advent — light the third candle on your wreath and reflect on the love in your life.",
-      22:"💌 Happy 1-year anniversary, my love! 🎉❤️ I still remember the moment we met like it was yesterday, and every day since has been a beautiful adventure with you. Thank you for filling my life with laughter, love, and warmth. Today I celebrate us — every smile, every hug, every little moment that makes us ‘us’. I love you more than words can say, and I can’t wait for all the memories we'll create together. 💖",
-      23:"Take a moment today to call or text someone you love — share some joy.",
-      24:"Tonight is Christmas Eve! Take a quiet moment and remember how much I love you. I can’t wait for tomorrow!",
-      25:"Merry Christmas, my love! Thank you for being the most wonderful part of my life. I love you endlessly 💖."
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA01ppcnmR___c1-bN1Zz3VfNy9ke7LomA",
+      authDomain: "advent-calendar-574ec.firebaseapp.com",
+      databaseURL: "https://advent-calendar-574ec-default-rtdb.firebaseio.com",
+      projectId: "advent-calendar-574ec",
+      storageBucket: "advent-calendar-574ec.appspot.com",
+      messagingSenderId: "575683037336",
+      appId: "1:575683037336:web:c5f1c9579c8c93d63568ed"
     };
 
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const USER_ID = "Lovro"; // user name
+    const calendar = document.getElementById("calendar");
+    const modalBg = document.getElementById("modalBg");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    /*const month = 12; // For testing purposes, set to December
+    const day = 3;   // For testing purposes, set to 25th*/
+
+    const messages = {
+      1: "Hello my love! This is the first day of our 2025 advent adventure. Today, take a moment to smile and know that I’m thinking of you. You’re amazing.",
+      2: "Send me a funny picture today — I want to see that beautiful smile!",
+      3: "Take a moment to relax and do something that makes you happy, just for you.",
+      4: "Write down three things you’re proud of today — you’re incredible, and I love you.",
+      5: "I love you to the moon and back <3",
+      6: "Think of 5 things you are grateful for today — I hope one of them is us ♥",
+      7: "It’s the secound Sunday of Advent! Light the second candle on your wreath and think of all the joy coming this season.",
+      8: "Take a short walk outside and breathe deeply — I’ll be thinking of you while you do",
+      9: "Send me a song that makes you smile today — I want to feel your vibes even from afar.",
+      10: "Do something creative today, even if it’s small — draw, write, or just doodle. I love your imagination",
+      11: "Treat yourself to your favorite snack or drink — you deserve it, my love",
+      12: "Think of a memory we shared that makes you laugh and carry that happiness with you today",
+      13: "Write a little note to yourself reminding how amazing and strong you are — and yes, I agree",
+      14: "Third Sunday of Advent! Light the third candle on your wreath and think of all the warmth around you.",
+      15: "Take 10 minutes today just for yourself — read, meditate, or simply enjoy a quiet moment",
+      16: "Take a moment today to call or text someone you love — share some joy",
+      17: "Do one small act of kindness today, whether for someone else or yourself — spread joy",
+      18: "Think about one dream you want to achieve — I believe in you completely. Im sure you can achieve anything you set your mind to.",
+      19: "Treat yourself to something cozy tonight — maybe a warm drink or comfy socks",
+      20: "Write a short list of things that make you happy — I hope our love is on there somewhere",
+      21: "Fourth Sunday of Advent! Light the Fourth candle on your wreath and reflect on all the love that surrounds you",
+      22: "Happy 1-year anniversary, my love! I still remember the moment we met like it was yesterday, and every day since has been a beautiful adventure with you. Thank you for filling my life with laughter, love, and warmth. Today, I celebrate us — every smile, every hug, every little moment that makes us ¨us¨¨. I love you more than words can ever say, and I can’t wait for all the memories we’ll create together in the years to come. ♥",
+      23: "Think of three little ways you made someone smile recently — you’re amazing",
+      24: "onight is Christmas Eve! Take a quiet moment and remember how much I love you. I can’t wait for tomorrow!",
+      25: "Merry Christmas, my love! Thank you for being the most wonderful part of my life. I love you endlessly 🎄♥"
+    };
+
+    const userRef = ref(db, `users/${USER_ID}/openedDays`);
     let openedDays = [];
-    let photosCache = {};
-    let currentModalDay = null;
 
-    async function loadOpenedDays(){
-      const { data, error } = await supabase.from('opened_days').select('day').eq('user_id',USER_ID);
-      openedDays = data ? data.map(r=>r.day) : [];
-    }
+    // Render calendar based on openedDays and current day
+    function renderCalendar() {
+      calendar.innerHTML = "";
+      for (let i = 1; i <= 25; i++) {
+        const box = document.createElement("div");
+        box.classList.add("day");
+        box.textContent = i;
 
-    async function loadPhotos(){
-      const { data, error } = await supabase.from('photos').select('day,url,path').eq('user_id',USER_ID);
-      photosCache = {};
-      if(data) data.forEach(r=>{ photosCache[r.day]={url:r.url,path:r.path}; });
-    }
-
-    async function initialLoad(){
-      await Promise.all([loadOpenedDays(), loadPhotos()]);
-      renderCalendar();
-    }
-    initialLoad();
-
-    setInterval(async()=>{ await Promise.all([loadOpenedDays(),loadPhotos()]); renderCalendar(); if(currentModalDay) showPhotoForDay(currentModalDay); },4000);
-
-    function renderCalendar(){
-      calendar.innerHTML='';
-      for(let i=1;i<=25;i++){
-        const box=document.createElement('div');
-        box.className='day';
-        box.textContent=i;
-        if(openedDays.includes(i)){
-          box.classList.add('opened');
-          box.onclick = ()=>openModal(i);
-        } else if(month===12 && i===day){
-          box.classList.add('available','current');
-          box.onclick = ()=>openToday(i);
+        if (openedDays.includes(i)) {
+          box.classList.add("opened");
+          box.onclick = () => openModal(i);
+        } else if (month === 12 && i === day) {
+          box.classList.add("available", "current");
+          box.onclick = () => openToday(i);
+        } else if (month === 12 && i < day) {
+          // Past days (locked, cannot open)
+          box.classList.add("day");
+        } else if (month === 12 && i > day) {
+          // Future days (locked)
+          box.classList.add("day");
         }
+
         calendar.appendChild(box);
       }
     }
 
-    async function openToday(dayNumber){
-      if(!openedDays.includes(dayNumber)){
-        await supabase.from('opened_days').insert([{user_id:USER_ID,day:dayNumber}],{upsert:true});
+    // Open a box today
+    function openToday(dayNumber) {
+      if (!openedDays.includes(dayNumber)) {
         openedDays.push(dayNumber);
+        set(userRef, openedDays);
       }
       openModal(dayNumber);
       renderCalendar();
     }
 
-    function openModal(dayNumber){
-      currentModalDay = dayNumber;
-      modalTitle.textContent=`Day ${dayNumber}`;
-      modalContent.textContent=messages[dayNumber]||'No message yet.';
-      uploadStatus.style.display='none';
-      photoUpload.value='';
-      uploadRow.style.display = openedDays.includes(dayNumber)?'flex':'none';
-      showPhotoForDay(dayNumber);
-      modalBg.style.display='flex';
+    // Modal popup
+    function openModal(dayNumber) {
+      modalTitle.textContent = `Dan ${dayNumber}`;
+      modalContent.textContent = messages[dayNumber] || "No message yet.";
+      modalBg.style.display = "flex";
     }
+    window.closeModal = () => modalBg.style.display = "none";
 
-    function showPhotoForDay(dayNumber){
-      const rec = photosCache[dayNumber];
-      if(rec && rec.url){
-        uploadedPhoto.src = rec.url;
-        uploadedPhoto.style.display='block';
-        deletePhotoBtn.style.display='inline-block';
-      } else {
-        uploadedPhoto.style.display='none';
-        deletePhotoBtn.style.display='none';
-      }
-    }
-
-    uploadBtn.addEventListener('click',async()=>{
-      const file = photoUpload.files[0];
-      if(!file || !currentModalDay) return;
-      uploadStatus.style.display='block';
-      uploadStatus.textContent='Uploading...';
-      try{
-        const timestamp=Date.now();
-        const cleanName=file.name.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_\.-]/g,'');
-        const path=`users/${USER_ID}/day${currentModalDay}/${timestamp}_${cleanName}`;
-        const { error:uploadErr } = await supabase.storage.from('photos').upload(path,file,{upsert:true});
-        if(uploadErr) throw uploadErr;
-        const { data:urlData } = supabase.storage.from('photos').getPublicUrl(path);
-        const publicUrl = urlData.publicUrl;
-        await supabase.from('photos').upsert([{user_id:USER_ID,day:currentModalDay,url:publicUrl,path}],{onConflict:'day'});
-        photosCache[currentModalDay]={url:publicUrl,path};
-        showPhotoForDay(currentModalDay);
-        uploadStatus.textContent='Uploaded!';
-        setTimeout(()=>uploadStatus.style.display='none',1800);
-      } catch(err){
-        console.error('Upload error',err);
-        uploadStatus.textContent='Upload failed.';
-      }
+    // Fetch user's opened days from Firebase
+    onValue(userRef, snapshot => {
+      openedDays = snapshot.val() || [];
+      renderCalendar();
     });
-
-    deletePhotoBtn.addEventListener('click',async()=>{
-      if(!currentModalDay) return;
-      const rec = photosCache[currentModalDay];
-      if(!rec) return;
-      uploadStatus.style.display='block';
-      uploadStatus.textContent='Removing...';
-      try{
-        if(rec.path) await supabase.storage.from('photos').remove([rec.path]);
-        await supabase.from('photos').delete().match({user_id:USER_ID,day:currentModalDay});
-        delete photosCache[currentModalDay];
-        showPhotoForDay(currentModalDay);
-        uploadStatus.textContent='Removed.';
-        setTimeout(()=>uploadStatus.style.display='none',1600);
-      } catch(err){
-        console.error('Delete photo error',err);
-        uploadStatus.textContent='Failed to remove photo.';
-      }
-    });
-
-    closeBtn.addEventListener('click',()=>{ modalBg.style.display='none'; currentModalDay=null; });
-    modalBg.addEventListener('click',(e)=>{ if(e.target===modalBg){ modalBg.style.display='none'; currentModalDay=null; } });
 
     // Snowflakes
-    setInterval(()=>{
-      const s=document.createElement('div');
-      s.className='snowflake';
-      s.textContent='❄';
-      s.style.left=(Math.random()*100)+'vw';
-      s.style.fontSize=(10+Math.random()*22)+'px';
-      s.style.opacity=(0.6+Math.random()*0.4).toString();
-      s.style.animationDuration=(6+Math.random()*7)+'s';
-      document.body.appendChild(s);
-      setTimeout(()=>s.remove(),16000);
-    },600);
-
+    function createSnowflakes() {
+      setInterval(() => {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.textContent = '❄';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = 5 + Math.random() * 7 + 's';
+        snowflake.style.fontSize = 10 + Math.random() * 20 + 'px';
+        document.body.appendChild(snowflake);
+        setTimeout(() => snowflake.remove(), 12000);
+      }, 400);
+    }
+    createSnowflakes();
   </script>
 </body>
 </html>
