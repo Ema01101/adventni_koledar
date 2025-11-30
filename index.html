@@ -251,7 +251,8 @@
         // build storage path: users/<USER_ID>/day<N>/<timestamp>_<filename>
         const timestamp = Date.now();
         const filename = `${timestamp}_${file.name}`;
-        const path = `users/${USER_ID}/day${currentModalDay}/${filename}`;
+        const cleanName = filename.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\.-]/g, '');
+        const path = `users/${USER_ID}/day${currentModalDay}/${cleanName}`;
 
         // upload to storage bucket named 'photos'
         const { data: uploadData, error: uploadErr } = await supabase.storage
